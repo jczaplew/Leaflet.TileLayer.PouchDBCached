@@ -39,9 +39,8 @@ Empty the tile cache
   + `tilecache-miss` returns an object with a `tile` and `tileUrl`
   + `tilecache-load-start` returns the `bbox`, `minZoom`, and `maxZoom` being used to seed the cache
   + `tilecache-load-progress` returns `done` which is the number of tiles that have been cached, and `total` which is the total number of tiles being cached
-  + `tilecache-load-done` return `true`
+  + `tilecache-load-done` returns `true`
 
 
 ## Developing
-
 `gulp`
