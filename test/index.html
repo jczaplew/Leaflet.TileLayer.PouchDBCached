@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width" charset="UTF-8">
+  <title>leaflet-tilelayer-pouchdb demo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.css" />
+  <style>
+    body {
+      padding:0;
+      margin:0;
+    }
+    #map {
+      position:absolute;
+      width:100%;
+      height:100%;
+    }
+    .cache-map {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      padding: 10px;
+      height: 40px;
+      width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+      z-index: 999;
+    }
+    .cache-map-button {
+      font-weight: bold;
+    }
+
+    .cache-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      padding: 50px;
+      position: absolute;
+      height: 50%;
+      width: 50%;
+      left: 15%;
+      top: 15%;
+      border-radius: 6px;
+      font-size: 25px;
+      margin: 0 auto;
+      z-index: 9999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+</head>
+<body>
+  <div class="container">
+    <div id="map"></div>
+    <div class="cache-map" id="cache-the-map">
+      <div class="cache-map-button">
+        Cache map
+      </div>
+    </div>
+    <div class="cache-loading">
+      Cache loading...
+    </div>
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.1.0/pouchdb.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.js"></script>
+  <script src="../dist/leaflet-tilelayer-pouchdb.min.js"></script>
+  <script>
+
+    var map = L.map('map').setView([19, 72.8], 11);
+
+    // add tile layer
+    var tiles = L.tileLayer('http://maps.metastudio.org/tiles/basemap/{z}/{x}/{y}/tile.png', {
+      useCache: true
+    }).addTo(map);
+
+
+    document.querySelector("#cache-the-map").addEventListener('click', function() {
+      tiles.seed(map.getBounds(), map.getZoom(), map.getZoom() + 1);
+    });
+
+    tiles.on('tilecache-hit', function() {
+      console.log('cache hit');
+    });
+    tiles.on('tilecache-miss', function() {
+      console.log('cache miss');
+    });
+
+
+    tiles.on('tilecache-load-start', function() {
+      console.log('Begin seeding cache');
+    });
+    tiles.on('tilecache-load-progress', function(progress) {
+      console.log(progress.done + ' of ' + progress.total);
+    });
+    tiles.on('tilecache-load-done', function() {
+      console.log('Done seeding cache!')
+    });
+  </script>
+
+</body>
+<html>
