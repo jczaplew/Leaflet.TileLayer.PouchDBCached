@@ -178,6 +178,8 @@ L.TileLayer.include({
 	_seedTiles: function(tiles) {
 		var baseURL = this._url;
 		var accountedFor = 0;
+    var downloadSize = 0;
+    var head = 'data:image/png;base64,';
 
 		asyncEach(tiles, function(item, callback) {
 			var url = baseURL.replace('{x}', item[0]).replace('{y}', item[1]).replace('{z}', item[2]);
@@ -193,6 +195,7 @@ L.TileLayer.include({
 						}, url, timestamp);
 
 						accountedFor += 1;
+            downloadSize += Math.round((data.length - head.length)*3/4)
 
 						this.fire('tilecache-load-progress', {
 							done: accountedFor,
@@ -206,7 +209,9 @@ L.TileLayer.include({
 				}
 			}.bind(this));
 		}.bind(this), function() {
-		  this.fire('tilecache-load-done', true);
+		  this.fire('tilecache-load-done', {
+        downloadSize: (downloadSize/1000000).toFixed(2)
+      });
 		}.bind(this));
 	},
 

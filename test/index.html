@@ -116,8 +116,8 @@
     tiles.on('tilecache-load-progress', function(progress) {
       console.log(progress.done + ' of ' + progress.total);
     });
-    tiles.on('tilecache-load-done', function() {
-      console.log('Done seeding cache!')
+    tiles.on('tilecache-load-done', function(size) {
+      console.log('Done seeding cache!', size)
     });
 
     tiles.on('tilecache-clear-start', function() {

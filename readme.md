@@ -34,7 +34,7 @@ Seed the PouchDB cache with all tiles that fill the provided bounding box betwee
 Uses a database called `offline-tiles`. Fires the following events:
   + `tilecache-load-start` returns the `bbox`, `minZoom`, and `maxZoom` being used to seed the cache
   + `tilecache-load-progress` returns `done` which is the number of tiles that have been cached, and `total` which is the total number of tiles being cached
-  + `tilecache-load-done` returns `true` when the given extent has been cleared
+  + `tilecache-load-done` returns an object with `downloadSize`, which is the number of megabytes of tiles downloaded
 
 
 #### .clear(latlngBounds, minZoom, maxZoom)
