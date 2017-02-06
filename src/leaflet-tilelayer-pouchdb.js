@@ -105,7 +105,7 @@ L.TileLayer.include({
 
 				// Offline, not cached
 				if (this.options.useOnlyCache) {
-					tile.onload  = this._tileOnLoad;
+          tile.onload = L.bind(this._tileOnLoad, this, done, L.Util.emptyImageUrl);
 					tile.src = L.Util.emptyImageUrl;
 				} else {
 					// Online, not cached, request the tile normally
@@ -176,7 +176,6 @@ L.TileLayer.include({
 	},
 
 	_seedTiles: function(tiles) {
-	//	document.querySelector(".cache-loading").style.display = 'flex';
 		var baseURL = this._url;
 		var accountedFor = 0;
 
@@ -209,12 +208,63 @@ L.TileLayer.include({
 		}.bind(this), function() {
 		  this.fire('tilecache-load-done', true);
 		}.bind(this));
-
 	},
 
-  clearCache: function() {
+  // Clears the cache for a given bounding box and zoom range
+  clear: function(bbox, minZoom, maxZoom) {
+    this.fire('tilecache-clear-start')
+    var polygon = {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [bbox._southWest.lng, bbox._southWest.lat],
+          [bbox._southWest.lng, bbox._northEast.lat],
+          [bbox._northEast.lng, bbox._northEast.lat],
+          [bbox._northEast.lng, bbox._southWest.lat],
+          [bbox._southWest.lng, bbox._southWest.lat]
+        ]
+      ]
+    }
+
+    var tiles = [];
+
+    for (var i = minZoom; i < maxZoom + 1; i++) {
+      tiles = tiles.concat(tileCover(polygon, {min_zoom: i, max_zoom: i}));
+    }
+
+    var baseURL = this._url;
+    var accountedFor = 0;
+
+    asyncEach(tiles, function(item, callback) {
+      var url = baseURL.replace('{x}', item[0]).replace('{y}', item[1]).replace('{z}', item[2]);
+
+      this._db.get(url, function(error, data) {
+        if (data) {
+          this._db.remove(data, function(error) {
+            callback(null)
+          })
+        } else {
+          callback(null)
+        }
+        accountedFor += 1;
+        this.fire('tilecache-clear-progress', {
+          done: accountedFor,
+          total: tiles.length
+        });
+      }.bind(this))
+    }.bind(this), function() {
+      this._db.compact(function(error) {
+        this.fire('tilecache-clear-done', true);
+      }.bind(this))
+    }.bind(this));
+  },
+
+  destroy: function(callback) {
 		this._db.destroy().then(function() {
 			this._db = new PouchDB('offline-tiles');
+      if (callback) {
+        callback(null)
+      }
 		}.bind(this));
 	}
 

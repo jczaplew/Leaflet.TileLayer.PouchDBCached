@@ -1,6 +1,6 @@
 {
   "name": "leaflet-tilelayer-pouchdb",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Cache map tiles to a PouchDB",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "offline",
     "tiles"
   ],
-  "author": "John J Czaplewski <jczaplew@gmail.com>",
+  "author": "John J Czaplewski <john@czaplewski.org>",
   "license": "CC0",
   "devDependencies": {
     "gulp": "^3.9.0",

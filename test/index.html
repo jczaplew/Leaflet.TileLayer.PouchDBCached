@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width" charset="UTF-8">
   <title>leaflet-tilelayer-pouchdb demo</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
   <style>
     body {
       padding:0;
@@ -31,6 +31,10 @@
     }
     .cache-map-button {
       font-weight: bold;
+    }
+    #clear-cache {
+      bottom: 80px;
+      width: 100px;
     }
 
     .cache-loading {
@@ -65,6 +69,11 @@
         Cache map
       </div>
     </div>
+    <div class="cache-map" id="clear-cache">
+      <div class="cache-map-button">
+        Clear cache
+      </div>
+    </div>
     <div class="cache-loading">
       Cache loading...
     </div>
@@ -72,20 +81,25 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/5.1.0/pouchdb.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.2.rc.2/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
   <script src="../dist/leaflet-tilelayer-pouchdb.min.js"></script>
   <script>
 
     var map = L.map('map').setView([19, 72.8], 11);
 
     // add tile layer
-    var tiles = L.tileLayer('http://maps.metastudio.org/tiles/basemap/{z}/{x}/{y}/tile.png', {
-      useCache: true
+    var tiles = L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      useCache: true,
+      useOnlyCache: true
     }).addTo(map);
 
 
     document.querySelector("#cache-the-map").addEventListener('click', function() {
       tiles.seed(map.getBounds(), map.getZoom(), map.getZoom() + 1);
+    });
+
+    document.querySelector("#clear-cache").addEventListener('click', function() {
+      tiles.clear(map.getBounds(), map.getZoom(), map.getZoom() + 1);
     });
 
     tiles.on('tilecache-hit', function() {
@@ -105,6 +119,16 @@
     tiles.on('tilecache-load-done', function() {
       console.log('Done seeding cache!')
     });
+
+    tiles.on('tilecache-clear-start', function() {
+      console.log('Begin cache clear')
+    })
+    tiles.on('tilecache-clear-progress', function(progress) {
+      console.log(progress.done + ' of ' + progress.total);
+    })
+    tiles.on('tilecache-clear-done', function() {
+      console.log('Done clearing cache')
+    })
   </script>
 
 </body>
